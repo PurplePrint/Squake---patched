@@ -1,0 +1,60 @@
+buildscript {
+    repositories {
+        jcenter()
+        maven {
+            name = "forge"
+            url = "https://files.minecraftforge.net/maven"
+        }
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+    }
+}
+
+apply plugin: 'net.minecraftforge.gradle.forge'
+
+minecraft {
+    version = "1.12.2-14.23.0.2486"
+    mappings = "snapshot_20170625"
+    runDir = "run"
+
+    coreMod = "squeek.quakemovement.ASMPlugin"
+
+    replace "\${version}", project.version
+    replaceIn "ModInfo.java"
+}
+
+group = project.projectDir.name.toLowerCase()
+archivesBaseName = project.projectDir.name + "-mc" + project.minecraft.version
+
+sourceSets.main.java.srcDirs += 'java'
+sourceSets.main.resources.srcDirs += 'resources'
+
+repositories {
+    flatDir {
+        dirs 'libs'
+    }
+}
+
+dependencies {
+    implementation name: 'OpenGlider-1.12.1-1.1.0'
+    implementation name: 'techguns-1.12.2-2.0.2.0_pre3.2'
+}
+
+jar {
+    manifest {
+        attributes 'FMLCorePlugin': 'squeek.quakemovement.ASMPlugin'
+        attributes 'FMLCorePluginContainsFMLMod': 'true'
+    }
+}
+
+processResources {
+    inputs.property "vars", project.version + project.minecraft.version
+    from(sourceSets.main.resources.srcDirs) {
+        include '**/*.info'
+        expand 'version':project.version, 'mcversion':project.minecraft.version
+    }
+    from(sourceSets.main.resources.srcDirs) {
+        exclude '**/*.info'
+    }
+}
